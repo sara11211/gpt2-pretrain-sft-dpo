@@ -1,9 +1,9 @@
-from importlib.metadata import version
 import tiktoken
 import torch
 from torch.utils.data import Dataset, DataLoader
 
-file_path = "data/input.txt"
+
+file_path = "../data/input.txt"
 
 # Hyperparameters
 batch_size = 8
@@ -12,6 +12,10 @@ vocab_size = 50257
 output_dim = 256
 context_length = 1024
 
+
+# =========================================================
+# Dataset
+# =========================================================
 
 class GPTDatasetV1(Dataset):
     def __init__(self, txt, tokenizer, max_length, stride):
@@ -37,6 +41,10 @@ class GPTDatasetV1(Dataset):
         return self.input_ids[idx], self.target_ids[idx]
 
 
+# =========================================================
+# DataLoader
+# =========================================================
+
 def create_dataloader_v1(txt, batch_size, max_length, stride,
                          shuffle=True, drop_last=True, num_workers=0):
     # Initialize the tokenizer
@@ -52,32 +60,43 @@ def create_dataloader_v1(txt, batch_size, max_length, stride,
     return dataloader
 
 
-# Open dataset file and read the text
-with open(file_path, "r", encoding="utf-8") as f:
-    raw_text = f.read()
 
-# Create token and position embedding layers
-token_embedding_layer = torch.nn.Embedding(vocab_size, output_dim)
-pos_embedding_layer = torch.nn.Embedding(context_length, output_dim)
+# =========================================================
+# Main Execution
+# =========================================================
 
-# Create dataloader
-dataloader = create_dataloader_v1(
-    raw_text,
-    batch_size=batch_size,
-    max_length=max_length,
-    stride=max_length
-)
+def main():
+    
+    # Open dataset file and read the text
+    with open(file_path, "r", encoding="utf-8") as f:
+        raw_text = f.read()
 
-# Iterate through the dataloader and get the input and target batches
-for batch in dataloader:
-    x, y = batch
+    # Create token and position embedding layers
+    token_embedding_layer = torch.nn.Embedding(vocab_size, output_dim)
+    pos_embedding_layer = torch.nn.Embedding(context_length, output_dim)
 
-    token_embeddings = token_embedding_layer(x)
-    pos_embeddings = pos_embedding_layer(torch.arange(max_length))
+    # Create dataloader
+    dataloader = create_dataloader_v1(
+        raw_text,
+        batch_size=batch_size,
+        max_length=max_length,
+        stride=max_length
+    )
 
-    input_embeddings = token_embeddings + pos_embeddings
+    # Iterate through the dataloader and get a batch of input and target 
+    for batch in dataloader:
+        x, y = batch
 
-    break
+        token_embeddings = token_embedding_layer(x)
+        pos_embeddings = pos_embedding_layer(torch.arange(max_length))
 
-# Print the shape of the input embeddings
-print(input_embeddings.shape)
+        input_embeddings = token_embeddings + pos_embeddings
+
+        break
+
+    # Print the shape of the input embeddings
+    print("Input embeddings shape:", input_embeddings.shape)
+
+
+if __name__ == "__main__":
+    main()
