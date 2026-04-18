@@ -53,7 +53,8 @@ class FeedForward(nn.Module):
         super().__init__()
         self.layers = nn.Sequential(
             
-            # Linear layer that expands the embedding dimension to 4 times its size to allow learning complex interactions and combining features
+            # Linear layer that expands the embedding dimension to 4 times 
+            # its size to allow learning complex interactions and features
             nn.Linear(cfg["emb_dim"], 4 * cfg["emb_dim"]),
             GELU(),
             nn.Linear(4 * cfg["emb_dim"], cfg["emb_dim"])
@@ -81,7 +82,8 @@ class TransformerBlock(nn.Module):
         
         self.ff = FeedForward(cfg)
         
-        # Instanciate two LayerNorms because each has its own learnable parameters and they are applied at different points in the architecture
+        # Instanciate two LayerNorms because each has its own learnable parameters 
+        # and they are applied at different points in the architecture
         self.norm1 = LayerNorm(cfg["emb_dim"])
         self.norm2 = LayerNorm(cfg["emb_dim"])
         self.drop_shortcut = nn.Dropout(cfg["drop_rate"])
