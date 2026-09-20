@@ -1,4 +1,4 @@
-# LLM From Scratch
+# Small GPT2
 
 A from-scratch PyTorch implementation of the full GPT2-style LLM training lifecycle: self-attention, pretraining on raw text, supervised finetuning (SFT) on instructions, and preference alignment with Direct Preference Optimization (DPO).
 ## Architecture
@@ -7,18 +7,6 @@ A from-scratch PyTorch implementation of the full GPT2-style LLM training lifecy
 - Transformer Blocks (Pre-LN, residual connections)
 - GELU Activation & Feed-Forward Networks
 - GPT-2 Model (token + positional embeddings)
-
-## Training Pipeline
-
-| Stage | What it does | Script |
-|---|---|---|
-| **Pretrain** | Learn language from raw text (next-token prediction) | `pretrain.py` |
-| **SFT** | Learn to follow instructions | `finetuning.py` |
-| **DPO** | Learn human preferences (polite vs impolite) | `dpo.py` |
-
-```
-Raw text → Pretrain → Base model → SFT → Instruction model → DPO → Aligned model
-```
 
 ## Project Structure
 
@@ -51,36 +39,6 @@ python dpo.py --test_mode             # DPO
 python pretrain.py                    # pretrain on raw text
 python finetuning.py                  # finetune on instructions → saves gpt2-medium355M-sft.pth
 python dpo.py                         # align with DPO → saves gpt2-medium355M-dpo.pth
-```
-
-## Data Format
-
-**Pretrain:** Raw text file at `data/input.txt`
-
-**SFT:** JSON array with instruction, input, and output:
-
-```json
-[
-  {
-    "instruction": "What is the capital of France?",
-    "input": "",
-    "output": "The capital of France is Paris."
-  }
-]
-```
-
-**DPO:** JSON array with instruction, chosen, and rejected responses:
-
-```json
-[
-  {
-    "instruction": "What is the capital of France?",
-    "input": "",
-    "output": "The capital of France is Paris.",
-    "chosen": "The capital of France is Paris.",
-    "rejected": "Paris is the capital of France, obviously."
-  }
-]
 ```
 
 ## Reference
